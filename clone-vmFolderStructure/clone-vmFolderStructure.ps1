@@ -14,8 +14,8 @@ if ($err1) {
 }
 
 #-- connect to vCenters
-$oldVC=connect-viserver sjdvmvw02 -ErrorVariable Err1
-$newVC=connect-viserver sjdvmvw04 -ErrorVariable Err1
+$oldVC=connect-viserver (read-host "What is the vCenter address where the folderstructure is copied from ? [FQDN]") -ErrorVariable Err1
+$newVC=connect-viserver  (read-host "What is the vCenter address where the folderstructure is being created ? [FQDN]") -ErrorVariable Err1
 if ($err1 ) {
     write-host "Mislukt om te verbinden met een vCenter."
     write-host $err1

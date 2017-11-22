@@ -33,30 +33,7 @@ if ($err1) {
 
 #-- select vSphere host to add to deployrule
 $vmhost2Add=get-vmhost | sort name | Out-GridView -PassThru -Title 'Welke vSphere host wordt toegevoegd ?'
-#-- check if host is in maintenance mode
-while ($vmhost2Add.ConnectionState -ne 'Maintenance') {
-    Do {
-        $answer=read-host ($vmHost2Add.name + " staat niet in maintenance mode (heb je wel de goede host geselecteerd ?) ? [yN]")
-        Switch -Regex ($answer) {
-            "\A(Y|y)\Z" {
-                $loopDone=$true
-                set-vmhost -VMHost $vmhost2Add -State Maintenance -Evacuate -Confirm:$false
-                break
-            }
-            "\A(n|N|)\Z" {
-                $answer="N"
-                exit
-                $loopdone=$true
-                break
-            }
-            default { 
-                $loopdone=$false
-                write-host "Onbekend antwoord."
-                break
-            }
-       }
-    } until ($loopDone)    
-}
+
 $HostConnection=Test-Connection $vmhost2add.name -Count 1
 
 #-- add IPv4 addres of vSphere host to patternlist
@@ -71,11 +48,36 @@ get-deployruleset |ft -AutoSize
 $DR_update=get-deployrule -Name $DR_update.Name
 $DR_update.PatternList
 
+#-- Reboot Host
 Do {
     $answer=read-host ("Reboot " + $vmHost2Add.name + " ? [yN]")
     Switch -Regex ($answer) {
         "\A(Y|y)\Z" {
             $loopDone=$true
+            #-- check if host is in maintenance mode
+            while ($vmhost2Add.ConnectionState -ne 'Maintenance') {
+                Do {
+                    $answer=read-host ($vmHost2Add.name + " is not in maintenance mode, put it in maintenance mode and continue ? [yN]")
+                    Switch -Regex ($answer) {
+                        "\A(Y|y)\Z" {
+                            $loop2Done=$true
+                            set-vmhost -VMHost $vmhost2Add -State Maintenance -Evacuate -Confirm:$false
+                            break
+                        }
+                        "\A(n|N|)\Z" {
+                            $answer="N"
+                            exit
+                            $loop2done=$true
+                            break
+                        }
+                        default { 
+                            $loop2done=$false
+                            write-host "Onbekend antwoord."
+                            break
+                        }
+                }
+                } until ($loop2Done)    
+            }            
             restart-vmhost -VMHost $vmhost2Add -Confirm:$false -Evacuate:$true
             write-host "Host is restarting"
         }

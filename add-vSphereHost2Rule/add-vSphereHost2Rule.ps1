@@ -30,11 +30,10 @@ if ($global:DefaultVIServer.IsConnected -eq $null) {
     }
 }
 
-
 #-- deployrule to modify
-$DR_update=get-deployrule -ErrorVariable Err1 -name  (get-deployruleset | select -ExpandProperty rulelist | Out-GridView -PassThru -Title "Selecteer de rule waar de host aan toegevoegd moet worden.").name
-if ($err1) {
-    write-host " Cannot find deploy rule"
+$DR_update=get-deployruleset | select -ExpandProperty rulelist | Out-GridView -PassThru -Title "Selecteer de rule waar de host aan toegevoegd moet worden."
+if ($DR_update -eq $null) {
+    write-host " No Deployrule selected." -ForegroundColor Yellow
     exit
 }
 

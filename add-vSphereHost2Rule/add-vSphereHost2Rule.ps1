@@ -15,14 +15,21 @@ if ($err1) {
     write-host $err1
     exit
 }
-while (($global:DefaultVIServer.IsConnected -eq $null) -or $err1) {
+
+#-- Connect to vCenter server
+if(($global:DefaultVIServer.name -ne $viCenter) -and $global:DefaultVIServer.IsConnected) {
+    #-- disconnect from vCenter
+    Disconnect-VIServer -Confirm:$false -Force
+}
+if ($global:DefaultVIServer.IsConnected -eq $null) {
     connect-viserver $viCenter -ErrorVariable Err1
+    if ($err1) {
+        write-host "Mislukt om te verbinden met $viCenter"
+        write-host $err1
+        exit
+    }
 }
-if ($err1) {
-    write-host "Mislukt om te verbinden met $viCenter"
-    write-host $err1
-    exit
-}
+
 
 #-- deployrule to modify
 $DR_update=get-deployrule -ErrorVariable Err1 -name  (get-deployruleset | select -ExpandProperty rulelist | Out-GridView -PassThru -Title "Selecteer de rule waar de host aan toegevoegd moet worden.").name

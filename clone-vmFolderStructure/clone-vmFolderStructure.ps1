@@ -4,18 +4,12 @@ if (get-module -ListAvailable vmware*) {
     write-host "Geen PowerCLI gevonden."
     Exit
 }
-while (((get-module vmware*).count -lt ((get-module -listavailable vmware*).count)) -or $err1) {
-    get-module -ListAvailable vmware* | import-module -ErrorVariable Err1
-}
-if ($err1) {
-    write-host "Mislukt om PowerCLI te laden."
-    write-host $err1
-    exit
-}
+
 
 #-- connect to vCenters
-$oldVC=connect-viserver (read-host "What is the vCenter address where the folderstructure is copied from ? [FQDN]") -ErrorVariable Err1
-$newVC=connect-viserver  (read-host "What is the vCenter address where the folderstructure is being created ? [FQDN]") -ErrorVariable Err1
+$cred=Get-Credential
+$oldVC=connect-viserver (read-host "What is the vCenter address where the folderstructure is copied from ? [FQDN]") -Credential $cred  -ErrorVariable Err1
+$newVC=connect-viserver  (read-host "What is the vCenter address where the folderstructure is being created ? [FQDN]")  -Credential $cred -ErrorVariable Err1
 if ($err1 ) {
     write-host "Mislukt om te verbinden met een vCenter."
     write-host $err1

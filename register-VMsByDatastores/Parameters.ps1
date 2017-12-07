@@ -63,5 +63,5 @@ public enum Syslog_Severity
  DisconnectviServerOnExit=$true
 
 #-- vSphere vCenter FQDN
- vCenter="sjdvmvw01.ict.lan" #-- description of param1
+ vCenter="srv-vmvw-03.itnet.local" #-- description of param1
 }

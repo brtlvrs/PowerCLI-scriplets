@@ -237,7 +237,7 @@ Process{
     import-powercli
     connect-viserver $P.vcenter -ErrorAction SilentlyContinue -ErrorVariable Err1
     if ($err1) {
-        write-warning "Geen verbinding kunnen maken met $vCenter."
+        write-warning ("Geen verbinding kunnen maken met "+($p.vCenter))
         exit-script
     }
 

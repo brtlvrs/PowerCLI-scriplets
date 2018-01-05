@@ -20,13 +20,16 @@
         vmdk=@{
             disk1=@{
                 CapacityGB=5
-                StorageFormat="thin"
+                StorageFormat="thin" #-- Thin, Thick, EagerZeroedThick
+                persistence ="Persistent" #-- Persistent, IndependentPersistent, IndependentNonPersistent
                }
             disk2=@{
                 CapacityGB=5
-                StorageFormat="thin"
+                StorageFormat="thin" #-- Thin, Thick, EagerZeroedThick
+                persistence ="IndependentPersistent" #-- Persistent, IndependentPersistent, IndependentNonPersistent
                }
         }
+        
         network=@{
             nic1=@{
                 NetworkName="vlan3030"

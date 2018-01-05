@@ -198,13 +198,14 @@ Process{
         write-host ("Failed to connect to vCenter " + $P.vcenter) -ForegroundColor Yellow
         write-host ($err1)
         exit-script
-
     }
-    $vmName=$P.config.name
 
+    #-- get VM name
+    $vmName=$p.recipe.vm.name
+
+    #-- check if VM exists
     if (get-vm $vmName) {
-        DO {
-        
+        Do {       
             Do {
                 #-- ask question with the multiple options added between brackets. Capitalized option is the default option.
                 $answer=read-host ("VM $vmName exists, remove it ? [yN]")
@@ -233,22 +234,41 @@ Process{
                     }
                 }
                } until ($loopDone)
-        
-            Ask-yesNo @question
+            #-- end DO when VM doesn't exist
             $exitLoop= (get-vm $vmName).count -eq 0 # VM name doesn't exist
         } until ($exitLoop)
     }
-    $vmhost=(get-vmhost | Out-GridView -PassThru -Title "Select vmHost to create VM on")
-    $vmConfig=$P.config
-    $VM= new-vm -vmhost $vmhost @vmConfig
-    foreach ($disk in ($P.GetEnumerator() | sort name | ?{$_.name -ilike "disk*"})) {
+
+    #-- create new VM
+    #-- add vmhost and datastore to config
+    $p.recipe.vm.add('vmhost',(get-vmhost | Out-GridView -PassThru -Title "Select vmHost to create VM on"))
+    $p.recipe.vm.add('datastore',($vmhost | get-datastore | Out-GridView -PassThru -Title "Welke datastore ?"))
+    $param=$p.recipe.VM
+    $VM= new-vm @param
+
+    #-- add disks, first disk is already added
+    foreach ($disk in ($p.recipe.vmdk.GetEnumerator() | sort name | ?{$_.name -ilike "disk*"})) {
         $param=$disk.value
         New-HardDisk -VM $VM @param    
     }
-    
-    foreach ($setting in $P.advSetting.GetEnumerator()) {
+
+    #-- network
+    if ($P.recipe.network.count -gt 0) {
+        $VM | Get-NetworkAdapter | Remove-NetworkAdapter -confirm:$false
+        foreach ($nic in $P.recipe.network.GetEnumerator()) {
+        $param=$nic.Value
+        $VM | New-NetworkAdapter @param    
+        }       
+    }
+#    $param=$p.recipe.nic
+
+  #  $VM | Get-NetworkAdapter | Remove-NetworkAdapter -confirm:$false
+   # $VM | New-NetworkAdapter @param 
+
+    #-- set advanced settings VM
+    foreach ($setting in $p.recipe.advSetting.GetEnumerator()) {
         if (Get-AdvancedSetting -Entity $VM -Name $setting.key) { 
-            Set-AdvancedSetting -Value $settings.value}
+            Get-AdvancedSetting -Entity $VM -Name $setting.key | Set-AdvancedSetting -Value $settings.value}
         else {
             New-AdvancedSetting -Entity $VM -Name $setting.key -Value $setting.value -Confirm:$false
             }

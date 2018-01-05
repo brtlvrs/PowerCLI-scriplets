@@ -11,7 +11,7 @@
     script examples
 
 .NOTES
-    File Name          : script-template.ps1
+    File Name          : create-vmConfig.ps1
     Author             : B. Lievers
     Prerequisite       : PowerShell V2 over Vista and upper.
     Version            : 0.2.1

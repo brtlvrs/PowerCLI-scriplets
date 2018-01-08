@@ -167,9 +167,8 @@ Process{
         exit-script
     }
 
-    #-- Select VMs
+    #-- User selection of VMs (using out-gridview)
     $VMs=get-vm ((get-vm | Select-Object name,@{N='Cluster';E={get-cluster -VM $_.name}},powerstate,vmhost,folder) | Out-GridView -PassThru -Title "Welke VMs voor aanpassen advanced settings ?"  ).name
-    $VMsGrouped=$VMs | Group-Object -Property Powerstate
    
     #-- select only VMs that are Powered Off
     $VMs=$VMs | where {$_.PowerState -eq "PoweredOff"}
@@ -193,7 +192,6 @@ Process{
                 #-- create advanced setting
                 $rslt+=New-AdvancedSetting -Entity $VM -Name $setting.name -Value $setting.value -Confirm:$false| select @{N='VM';E={$VM.name}},name,value,description
             }
-    
         }
     }
  

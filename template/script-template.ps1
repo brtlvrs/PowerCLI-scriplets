@@ -43,27 +43,19 @@ Begin{
         $scriptpath=split-path -Path $scriptpath -Parent
     }
 
-    #-- initialize variables
+    # Gather all files
+    $Functions  = @(Get-ChildItem -Path ($scriptpath+"\"+$P.FunctionsSubFolder) -Filter *.ps1 -ErrorAction SilentlyContinue)
 
-# Gather all files
-$Functions  = @(Get-ChildItem -Path ($scriptpath+"\"+$P.FunctionsSubFolder) -Filter *.ps1 -ErrorAction SilentlyContinue)
-
-# Dot source the functions
-ForEach ($File in @($Functions)) {
-    Try {
-        . $File.FullName
-    } Catch {
-        Write-Error -Message "Failed to import function $($File.FullName): $_"
+    # Dot source the functions
+    ForEach ($File in @($Functions)) {
+        Try {
+            . $File.FullName
+        } Catch {
+            Write-Error -Message "Failed to import function $($File.FullName): $_"
+        }       
     }
-    
-}
-
-# Export the public functions for module use
-#Export-ModuleMember -Function $PublicFunctions.Basename
-
 
 #region Functions
-
     function exit-script {
     <#
     .DESCRIPTION

@@ -42,52 +42,12 @@ Begin{
         $scriptpath=split-path -Path $scriptpath -Parent
     }
 
-    #-- initialize variables
 
-#region Functions
+    #-- load functions
+    import-module $scriptpath\functions\functions.psm1 #-- the module scans the functions subfolder and loads them as functions
+    #-- add code to execute during exit script. Removing functions module
+    $p.Add("cleanUpCodeOnExit",{remove-module -Name functions -Force -Confirm:$false})
 
-    function exit-script {
-        <#
-        .DESCRIPTION
-            function to exit script clean.
-        #>
-
-        [CmdletBinding()]
-        Param()
-
-        #-- disconnect vCenter connections (if there are any)
-        if (((Get-Variable -Scope global -Name DefaultVIServers -ErrorAction SilentlyContinue ).value) -and ($P.noDisconnectOnExit -eq $false)) {
-            Disconnect-VIServer -server * -Confirm:$false
-        }
-
-        #-- clock time and say bye bye
-        $ts_end=get-date
-        if ($NormalExit) {write-host "Script ends normal."}
-        else {write-host "Scripts exit is premature." -ForegroundColor Yellow}
-        write-host ("Runtime script: {0:hh}:{0:mm}:{0:ss}" -f ($ts_end- $TS_start)  )
-        read-host "End script. bye bye ([Enter] to quit.)"
-        exit
-    }
-
-    function import-PowerCLi {
-    <#
-    .SYNOPSIS
-       Loading of all VMware modules
-    #>
-        [CmdletBinding()]
-        Param()
-        Process{
-            #-- check if PowerCLI is installed
-            if ((get-module -ListAvailable vmware*).count -lt 1) {
-                write-host "VMware PowerCLI modules not found."
-                exit-script
-            }
-            #-- Load all modules
-            get-module -ListAvailable vmware* | Import-Module
-        }
-    }
-    
-    #endregion
 }
 
 End{

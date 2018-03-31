@@ -1,6 +1,6 @@
 write-verbose "Loading script functions."
 # Gather all files
-$Functions  = @(Get-ChildItem -Path ($scriptpath+"\"+$P.FunctionsSubFolder) -Filter *.ps1 -ErrorAction SilentlyContinue)
+$Functions  = @(Get-ChildItem -Path ($scriptpath+"\functions") -Filter *.ps1 -ErrorAction SilentlyContinue)
 
 # Dot source the functions
 ForEach ($File in @($Functions)) {

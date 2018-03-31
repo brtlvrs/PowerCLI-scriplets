@@ -23,7 +23,7 @@ function exit-script {
             disconnect-viserver * -erroraction silentlycontinue -confirm:$false
         }
 
-       .PARAMETER defaultcleanupcode
+       .PARAMETER cleanupcode
         [scriptblock] Input parameter of type scriptblock.
         code to be run during exiting script. p.e. clode to clean up variables, or to disconnect from remote services etc...
     .EXAMPLE
@@ -42,14 +42,14 @@ function exit-script {
     #>
     [CmdletBinding()]
     Param(
-          [scriptblock]$defaultcleanupcode)
+          [scriptblock]$CleanUpCode)
 
     if ($finished_normal) {
         $msg= "Hooray.... finished without any bugs....."
         if ($log) {$log.verbose($msg)} else {Write-Verbose $msg}
     } else {
         $msg= "(1) Script ended with errors."
-        if ($log) {$log.error($msg)} else {Write-Error $msg}
+        if ($log) {$log.error($msg)} else {Write-warning $msg}
     }
 
     #-- execute cleanup actions
@@ -58,8 +58,8 @@ function exit-script {
     }
 
     #-- run unique code 
-    if ($defaultcleanupcode) {
-        $defaultcleanupcode.Invoke()
+    if ($CleanUpCode) {
+        $CleanUpCode.Invoke()
     }
     
     #-- Output runtime and say greetings

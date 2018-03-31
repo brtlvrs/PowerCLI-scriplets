@@ -42,13 +42,13 @@ Begin{
     }
 
     #-- load functions
-    import-module $scriptpath\functions.psm1 #-- the module scans the functions subfolder and loads them as functions
+    import-module $scriptpath\functions\functions.psm1 #-- the module scans the functions subfolder and loads them as functions
     #-- add code to execute during exit script. Removing functions module
     $p.Add("cleanUpCodeOnExit",{remove-module -Name functions -Force -Confirm:$false})
 }
 
 End{
-    $finished_normal=$false #-- to tell exit-script then we finished the script without script errors
+    $finished_normal=$true #-- to tell exit-script then we finished the script without script errors
     exit-script
 }
 

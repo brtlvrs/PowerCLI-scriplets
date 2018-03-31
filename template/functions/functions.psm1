@@ -1,3 +1,13 @@
+<#
+Code to add to the begin{} block of a script
+
+    #-- load functions
+    import-module $scriptpath\functions\functions.psm1 #-- the module scans the functions subfolder and loads them as functions
+    #-- add code to execute during exit script. Removing functions module
+    $p.Add("cleanUpCodeOnExit",{remove-module -Name functions -Force -Confirm:$false})
+
+#>
+
 write-verbose "Loading script functions."
 # Gather all files
 $Functions  = @(Get-ChildItem -Path ($scriptpath+"\functions") -Filter *.ps1 -ErrorAction SilentlyContinue)

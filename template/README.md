@@ -1,22 +1,31 @@
-**script-template**
-PowerCLI workflow script for building VMware vSphere ESXi images
+# script-template
 
-### LICENSE
+Powershell script to use as template for new scripts
+
+## LICENSE
+
 This script is released under the MIT license. See the License file for more details
 
 | | |
 |---|---|
-| Version | 0.0.1|
+| Version | 0.0.2|
 | branch | master|
+|Author| brtlvrs|
+| Dependencies| see below |
 
-### CHANGE LOG
+## CHANGE LOG
+
 |build|branch |  Change |
 |---|---|---|
+|0.0.1|Master| cleanup code, implement new way to load functions|
 |0.0| Master| Initial release|
 
-### How do I get set up?  
+## Setup
 
-#### Dependencies
+## Dependencies
 
-	- PowerShell 3.0
-	- PowerCLI > 6.5.x
+- PowerShell 3.0
+
+### Functions
+
+- exit-script.ps1

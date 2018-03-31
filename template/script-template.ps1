@@ -48,7 +48,7 @@ Begin{
 }
 
 End{
-    $finished_normal=$true #-- to tell exit-script then we finished the script without script errors
+    $NormalExit=$true #-- to tell exit-script then we finished the script without script errors
     exit-script
 }
 

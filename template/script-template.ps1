@@ -25,73 +25,39 @@ Param(
 
 Begin{
 #Parameters
-    $TS_start=Get-Date #-- get start time
+    $TS_start=Get-Date #-- get start time of script. Used in exit-script function to determine script execution time.
 
     #-- get script parameters
 	$scriptpath=(get-item (Split-Path -parent $MyInvocation.MyCommand.Definition)).fullname
     $scriptname=Split-Path -Leaf $MyInvocation.mycommand.path
     
-    #-- load default parameter
     #-- Load Parameterfile
     if (!(test-path -Path $scriptpath\parameters.ps1 -IsValid)) {
         write-warning "parameters.ps1 not found. Script will exit."
-        exit
-        
+        exit   
     }
     $P = & $scriptpath\parameters.ps1
     if ($P.ProjectIMFoldersAreSiblings) {
         $scriptpath=split-path -Path $scriptpath -Parent
     }
 
-    # Gather all files
-    $Functions  = @(Get-ChildItem -Path ($scriptpath+"\"+$P.FunctionsSubFolder) -Filter *.ps1 -ErrorAction SilentlyContinue)
-
-    # Dot source the functions
-    ForEach ($File in @($Functions)) {
-        Try {
-            . $File.FullName
-        } Catch {
-            Write-Error -Message "Failed to import function $($File.FullName): $_"
-        }       
-    }
-
-#region Functions
-    function exit-script {
-    <#
-    .DESCRIPTION
-        function to exit script clean.
-    #>
-
-    [CmdletBinding()]
-    Param()
-    #-- disconnect vCenter connections (if there are any)
-    if ((Get-Variable -Scope global -Name DefaultVIServers -ErrorAction SilentlyContinue ).value) {
-        Disconnect-VIServer -server * -Confirm:$false
-    }
-    #-- clock time and say bye bye
-    $ts_end=get-date
-    if ($NormalExit) {write-host "Script ends normal."}
-    else {write-host "Scripts exit is premature." -ForegroundColor Yellow}
-    write-host ("Runtime script: {0:hh}:{0:mm}:{0:ss}" -f ($ts_end- $TS_start)  )
-    read-host "End script. bye bye ([Enter] to quit.)"
-    exit
-    }
+    #-- load functions
+    import-module $scriptpath\functions.psm1 #-- the module scans the functions subfolder and loads them as functions
+    #-- add code to execute during exit script. Removing functions module
+    $p.Add("cleanUpCodeOnExit",{remove-module -Name functions -Force -Confirm:$false})
 }
 
 End{
-    $NormalExit=$true
+    $finished_normal=$false #-- to tell exit-script then we finished the script without script errors
     exit-script
 }
 
 Process{
-    import-module vmware.powercli
-#    connect-viserver $P.vCenter -ErrorVariable Err1
-    test-brtlvrs
+    import-module vmware.powercli -ErrorAction SilentlyContinue -ErrorVariable Err1
     if ($Err1) {
-        write-host ("Failed to connect to vCenter " + $P.vcenter) -ForegroundColor Yellow
+        write-host ("Failed to load PowerCLI.") -ForegroundColor Yellow
         write-host ($err1)
         exit-script
-
     }
 
 }

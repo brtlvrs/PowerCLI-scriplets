@@ -8,7 +8,7 @@ This script is released under the MIT license. See the License file for more det
 
 | | |
 |---|---|
-| Version | 0.0.2|
+| Version | 0.0.3|
 | branch | master|
 |Author| brtlvrs|
 | Dependencies| see below |
@@ -17,6 +17,7 @@ This script is released under the MIT license. See the License file for more det
 
 |build|branch |  Change |
 |---|---|---|
+|0.0.3|Master| added functionality to load multiple functions grouped in files.|
 |0.0.1|Master| cleanup code, implement new way to load functions|
 |0.0| Master| Initial release|
 

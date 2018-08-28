@@ -10,10 +10,12 @@ Code to add to the begin{} block of a script
 
 write-verbose "Loading script functions."
 # Gather all files
-$Functions  = @(Get-ChildItem -Path ($scriptpath+"\functions") -Filter *.ps1 -ErrorAction SilentlyContinue)
+$FunctionFiles  = @(Get-ChildItem -Path ($scriptpath+"\functions") -Filter *.ps1 -ErrorAction SilentlyContinue)
 
+#-- list current functions
+$currentFunctions = Get-ChildItem function:
 # Dot source the functions
-ForEach ($File in @($Functions)) {
+ForEach ($File in @($FunctionFiles)) {
     Try {
         . $File.FullName
     } Catch {
@@ -22,4 +24,8 @@ ForEach ($File in @($Functions)) {
 }
 
 # Export the public functions for module use
-Export-ModuleMember -Function $Functions.Basename
+$scriptFunctions = Get-ChildItem function: | Where-Object { $currentFunctions -notcontains $_ }
+foreach ($ScriptFunction in $scriptFunctions) {
+    # Export the public functions for module use
+    Export-ModuleMember -Function $ScriptFunction.name
+}
